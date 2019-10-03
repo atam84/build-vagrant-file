@@ -1,0 +1,111 @@
+{
+    "globals": {
+        "vagrant": {
+            "provider": {
+                "name": "virtualbox"
+            },
+            "config_version" : "2",
+            "provision": [
+                "yum install -y -q vim"
+            ]
+        },
+        "hosts": {
+            "generate_hosts": "True",
+            "domain" : "mylocal.cluster"
+        },
+        "users": [
+            {
+                "username": "vagrant",
+                "generate_sshkey": "True"
+            }
+        ],
+        "install_packages": {
+            "install_command": "yum install --nogpgcheck -q -y",
+            "packages": ["python3", "vim", "device-mapper-persistent-data", "lvm2", "docker-ce-18.06.1.ce-3.el7", "docker-ce-cli-18.06.1.ce-3.el7", "containerd.io"],
+            "is_the_first_action": "True"
+        },
+        "add_repos": {
+            "add_repos_commad": "yum-config-manager --add-repo",
+            "repos": ["https://download.docker.com/linux/centos/docker-ce.repo"],
+            "add_before_install_packages": "True",
+            "cmd_before_add_package": "yum install -y yum-utils"
+        },
+        "services": {
+            "to_enable": ["docker"],
+            "to_disable": ["firewalld"]
+        }
+    },
+    "vms": [
+        {
+            "os": "bento/centos-7.3",
+            "cpus": 1,
+            "memory": 1024,
+            "name": "snode01",
+            "hostname": "k-node01",
+            "network": [
+                {
+                    "type": "private_network",
+                    "ip": "192.168.70.150"
+                }
+            ],
+            "provision": [
+                "yum install -y -q vim"
+            ],
+            "config": {
+                "disable_swap": "True",
+                "disable_enforce_mode": "True"
+            }
+        },
+        {
+            "os": "bento/centos-7.3",
+            "cpus": 1,
+            "memory": 1024,
+            "name": "snode02",
+            "hostname": "k-node02",
+            "network": [
+                {
+                    "type": "private_network",
+                    "ip": "192.168.70.151"
+                }
+            ],
+            "config": {
+                "disable_swap": "True",
+                "disable_enforce_mode": "True"
+            }
+        },
+        {
+            "os": "bento/centos-7.3",
+            "cpus": 1,
+            "memory": 1024,
+            "name": "snode03",
+            "hostname": "k-node03",
+            "network": [
+                {
+                    "type": "private_network",
+                    "ip": "192.168.70.152"
+                }
+            ],
+            "config": {
+                "disable_swap": "True",
+                "disable_enforce_mode": "True"
+            }
+        },
+        {
+            "os": "bento/centos-7.3",
+            "cpus": 1,
+            "memory": 1024,
+            "name": "snode04",
+            "hostname": "k-node04",
+            "network": [
+                {
+                    "type": "private_network",
+                    "ip": "192.168.70.153"
+                }
+            ],
+            "config": {
+                "disable_swap": "True",
+                "disable_enforce_mode": "True"
+            }
+        }
+    ]
+}
