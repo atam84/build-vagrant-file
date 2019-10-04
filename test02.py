@@ -10,6 +10,10 @@
 
 import json
 from pprint import pprint
+import sys
+
+#file = open('Vagrantfile', 'a')
+#sys.stdout = file
 
 disable_swap_volume = {
     "varname": "$disable_swap",
@@ -59,6 +63,66 @@ global_services_disable = {
     "varname": "$global_disable_services",
     "script": ""
 }
+
+def generate_ssh_keys():
+    pass
+
+def generate_users(users_list):
+    create_commands = ""
+    for user in users_list:
+        compose = ""
+        try:
+            username = user["username"]
+        except:
+            continue
+
+        try:
+            home = user["home"]
+            if home == "":
+                compose = "{} --create-home".format(compose)
+            else:
+                compose = "{} --home-dir {} --create-home".format(compose, home)
+        except:
+            compose = "{} --create-home".format(compose)
+
+        try:
+            shell = user["shell"]
+            if shell != "":
+                compose = "{} --shell {}".format(compose, shell)
+        except:
+            pass
+
+        try:
+            uid = user["uid"]
+            if uid != "":
+                compose = "{} --uid {}".format(compose, uid)
+        except:
+            pass
+
+        try:
+            gid = user["gid"]
+            if gid != "":
+                compose = "{} --gid {}".format(compose, gid)
+        except:
+            pass
+
+        try:
+            groups = user["groups"]
+            if groups != []:
+                compose = "{} --groups {}".format(compose, ",".join(groups))
+        except:
+            pass
+
+        create_commands = "{} useradd {} {}\n".format(create_command, compose, username)
+
+    return create_commands
+        #comment =
+        #aks_change_password =
+        #password =
+        #useradd -c "" --home-dir /home/user --create-home --uid USERID --gid GROUPID --groups GRP1,GRP2 --shell SHELL --user-group USERNAME
+        #passwd --expire USERNAME
+
+
 
 def load_config(filename):
     try:
@@ -263,5 +327,3 @@ for index, __server in enumerate(json_config["vms"]):
         print('        SHELL')
     print('    end')
 print('end')
-
-
