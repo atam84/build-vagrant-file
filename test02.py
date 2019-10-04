@@ -11,6 +11,7 @@
 import json
 from pprint import pprint
 import sys
+import crypt
 
 #file = open('Vagrantfile', 'a')
 #sys.stdout = file
@@ -64,6 +65,16 @@ global_services_disable = {
     "script": ""
 }
 
+global_users = {
+    "varname": "$global_users",
+    "script": ""
+}
+
+global_etc_hosts = {
+    "varname": "$global_etc_hosts",
+    "script": ""
+}
+
 def generate_ssh_keys():
     pass
 
@@ -113,15 +124,37 @@ def generate_users(users_list):
         except:
             pass
 
-        create_commands = "{} useradd {} {}\n".format(create_command, compose, username)
+        try:
+            comment = user["comment"]
+            if comment != "":
+                compose = "{} -c '{}'".format(compose, comment)
+        except:
+            pass
+
+        try:
+            password = user["password"]
+            try:
+                is_crypted = password["crypted"]
+            except:
+                is_crypted = False
+            try:
+                secret = password["pass"]
+                if is_crypted and secret != "":
+                    compose = "{} --password '{}'".format(compose, crypt.crypt(secret))
+            except:
+                pass
+        except:
+            pass
+
+        create_commands = "{}useradd {} {}\n".format(create_commands, compose, username)
+        try:
+            force_reset_password = user["ask_change_password"]
+            if force_reset_password:
+               create_commands = "{}passwd --expire {}\n".format(create_commands, username)
+        except:
+            pass
 
     return create_commands
-        #comment =
-        #aks_change_password =
-        #password =
-        #useradd -c "" --home-dir /home/user --create-home --uid USERID --gid GROUPID --groups GRP1,GRP2 --shell SHELL --user-group USERNAME
-        #passwd --expire USERNAME
-
 
 
 def load_config(filename):
@@ -144,7 +177,9 @@ def generate_hosts(json_conf):
         gen_hosts = json_conf["globals"]["hosts"]["generate_hosts"]
     except:
         gen_hosts = False
-    etc_hosts = "127.0.0.1      localhost"
+    etc_hosts = """<<-SCRIPT
+cat << EOF > /etc/hosts
+127.0.0.1      localhost"""
     if gen_hosts:
         try:
             domain = json_conf["globals"]["hosts"]["domain"]
@@ -154,7 +189,7 @@ def generate_hosts(json_conf):
             hostname = vm["hostname"]
             for index, interface in enumerate(vm["network"]):
                 etc_hosts = '{}\n{}     {}      {}.{}'.format(etc_hosts, interface["ip"], hostname, hostname, domain)
-    return etc_hosts
+    return "{}\nEOF\nSCRIPT\n".format(etc_hosts)
 
 def generate_global_provision(json_conf):
     script = "<<-SCRIPT"
@@ -243,8 +278,11 @@ global_services_disable["script"]  = generate_global_services_disable(json_confi
 global_services_enable["script"]   = generate_global_services_enable(json_config)
 global_packages_install["script"]  = generate_global_packages_install(json_config)
 global_repos_add["script"]         = generate_global_repos_add(json_config)
+global_users["script"]             = generate_hosts(json_config)
+global_etc_hosts["script"]         = generate_users(json_config["globals"]["hosts"]["users"])
 
-print(generate_hosts(json_config))
+
+print('{} = {}'.format(global_users["varname"], global_users["script"]))
 print('{} = {}'.format(disable_swap_volume["varname"], disable_swap_volume["script"]))
 print('{} = {}'.format(disable_enforce_mode["varname"], disable_enforce_mode["script"]))
 print('{} = {}'.format(global_provision["varname"], global_provision["script"]))
@@ -298,6 +336,9 @@ for index, __server in enumerate(json_config["vms"]):
     print('            vmp.cpus = "{}"'.format(cpus))
     print('        end')
 
+    if global_users["script"]:
+        print('        machine.vm.provision "shell", inline: {}'.format(global_users["varname"]))
+
     if __disable_swap:
         print('        machine.vm.provision "shell", inline: {}'.format(disable_swap_volume["varname"]))
     if __disable_enforce_mode:
@@ -327,3 +368,4 @@ for index, __server in enumerate(json_config["vms"]):
         print('        SHELL')
     print('    end')
 print('end')
+
