@@ -11,14 +11,29 @@
         },
         "hosts": {
             "generate_hosts": "True",
-            "domain" : "mylocal.cluster"
+            "domain" : "mylocal.cluster",
+            "ssh_keys": {
+                "share_keys": "True",
+                "generate_keys": "True",
+                "users": ["vagrant", "root"]
+            },
+            "users": [
+                {
+                    "username": "atam84",
+                    "home": "/home/atam84",
+                    "shell": "/bin/bash",
+                    "uid": "",
+                    "gid": "",
+                    "groups": [],
+                    "comment": "",
+                    "ask_change_password": "Frue",
+                    "password": {
+                        "crypted": "False",
+                        "pass": "123456789"
+                    }
+                }
+            ]
         },
-        "users": [
-            {
-                "username": "vagrant",
-                "generate_sshkey": "True"
-            }
-        ],
         "install_packages": {
             "install_command": "yum install --nogpgcheck -q -y",
             "packages": ["python3", "vim", "device-mapper-persistent-data", "lvm2", "docker-ce-18.06.1.ce-3.el7", "docker-ce-cli-18.06.1.ce-3.el7", "containerd.io"],
