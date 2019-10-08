@@ -89,7 +89,7 @@ def generate_ssh_keys(vms_list, users):
             file_name   = "/tmp/{}_{}".format(user, vm_name)
             generated_files.append(file_name)
             generated_files.append("{}.pub".format(file_name))
-            keygen_cmd  = 'ssh-keygen -t rsa -N "" -f {}'.format(file_name)
+            keygen_cmd  = 'ssh-keygen -q -t rsa -N "" -f {}'.format(file_name)
             os.system(keygen_cmd)
             #time.sleep(2)
             private_key  = read_file(file_name)
