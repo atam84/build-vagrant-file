@@ -340,7 +340,7 @@ def ssh_key_push(generated_keys):
         print("${}_push_ssh_keys = <<-SCRIPT\n".format(gen_keys["vm"]))
         for vm in gen_keys["keys"]:
             print("mkdir -p /home/{}/.ssh".format(vm["username"]))
-            print("chown -R {}.{} /home/{}/.ssh".format(vm["username"], vm["username"]))
+            print("chown -R {}.{} /home/{}/.ssh".format(vm["username"], vm["username"], vm["username"]))
             print("cat << EOF > /home/{}/.ssh/id_rsa\n{}\nEOF\n".format(vm["username"], vm["private_key"]))
             print("cat << EOF > /home/{}/.ssh/id_rsa.pub\n{}\nEOF".format(vm["username"], vm["public_key"]))
         print("SCRIPT\n")
