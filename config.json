@@ -15,7 +15,7 @@
             "ssh_keys": {
                 "share_keys": "True",
                 "generate_keys": "True",
-                "users": ["vagrant", "root"]
+                "users": ["atam84", "sam", "greek"]
             },
             "users": [
                 {
@@ -26,7 +26,30 @@
                     "gid": "",
                     "groups": [],
                     "comment": "",
-                    "ask_change_password": "Frue",
+                    "ask_change_password": "False",
+                    "password": {
+                        "crypted": "False",
+                        "pass": "123456789"
+                    }
+                },
+                {
+                    "username": "sam",
+                    "home": "",
+                    "shell": "/bin/bash",
+                    "uid": "",
+                    "gid": "",
+                    "groups": [],
+                    "comment": "",
+                    "ask_change_password": "False",
+                    "password": {
+                        "crypted": "False",
+                        "pass": "123456789"
+                    }
+                },
+                {
+                    "username": "geek",
+                    "groups": [],
+                    "comment": "greek user",
                     "password": {
                         "crypted": "False",
                         "pass": "123456789"
